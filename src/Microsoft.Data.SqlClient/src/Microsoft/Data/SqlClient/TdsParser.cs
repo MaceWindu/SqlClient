@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Buffers;
 using System.Diagnostics;
-using System.Runtime.InteropServices;
-using System.Text;
 
 #nullable enable
 
@@ -185,7 +183,11 @@ namespace Microsoft.Data.SqlClient
             // length in bytes
             int length = TdsEnums.SQL2005_LOG_REC_FIXED_LEN;
 
-            Debug.Assert(TdsEnums.MAXLEN_CLIENTINTERFACE >= s_clientInterfaceName.Length, "cchCltIntName can specify at most 128 unicode characters. See Tds spec");
+            // Obtain the client interface name.
+            // e.g. "Microsoft SqlClient - Microsoft Windows 10.0.26100, .NET 8.0.11 - X64"
+            string clientInterfaceName = ClientInterface.Name;
+
+            Debug.Assert(TdsEnums.MAXLEN_CLIENTINTERFACE >= clientInterfaceName.Length, "cchCltIntName can specify at most 128 unicode characters. See Tds spec");
 
             // add up variable-len portions (multiply by 2 for byte len of char strings)
             checked

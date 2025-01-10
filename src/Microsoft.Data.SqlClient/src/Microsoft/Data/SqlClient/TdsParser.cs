@@ -8,65 +8,6 @@ namespace Microsoft.Data.SqlClient
 {
     internal partial class TdsParser
     {
-        private static string? s_clientInterfaceName;
-
-        internal void InitClientInterfaceName()
-        {
-            if (string.IsNullOrEmpty(s_clientInterfaceName))
-            {
-                // Construct client interface name in format: Microsoft SqlClient - {OS}, {Platform} - {architecture}
-                // e.g. "Microsoft SqlClient - Windows 10.0.26100, .NET 8.0.11 - X64"
-                // The client interface name is limited to 128 characters
-                s_clientInterfaceName = new StringBuilder(TdsEnums.SQL_PROVIDER_NAME)
-                    .Append(" - ").Append(GetOSInfo())
-                    .Append(", ").Append(RuntimeInformation.FrameworkDescription ?? TdsEnums.UNKNOWN)
-#if TARGET_X86 || TARGET_AMD64 || TARGET_ARM || TARGET_ARM64 || TARGET_WASM || TARGET_S390X || TARGET_LOONGARCH64 || TARGET_POWERPC64 || TARGET_RISCV64
-                    // Process Architecture is different than OS Architecture,
-                    // and indicates the architecture of the process that is running the application.
-                    .Append(" - ").Append(RuntimeInformation.ProcessArchitecture)
-#else
-                    .Append(" - ").Append(TdsEnums.UNKNOWN) // Architecture is unknown
-#endif
-                    .ToString();
-
-                // Do a final check to ensure the length of the client interface name is within the limit
-                if (s_clientInterfaceName.Length >= TdsEnums.MAXLEN_CLIENTINTERFACE)
-                {
-                    s_clientInterfaceName = s_clientInterfaceName.Substring(0, TdsEnums.MAXLEN_CLIENTINTERFACE);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Returns the OS information in the format: {OS Name} {OS Version}
-        /// </summary>
-        /// <returns></returns>
-        private static string GetOSInfo()
-        {
-            string osName = TdsEnums.UNKNOWN;
-            Version osVersion = Environment.OSVersion.Version;
-
-            if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                osName = $"{nameof(OSPlatform.Windows)} {osVersion}";
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-            {
-                osName = $"macOS {osVersion}";
-            }
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-            {
-                osName = $"{nameof(OSPlatform.Linux)} {osVersion}";
-            }
-#if NET
-            else if (RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
-            {
-                osName = $"{nameof(OSPlatform.FreeBSD)} {RuntimeEnvironment.GetSystemVersion()}";
-            }
-#endif
-            return osName;
-        }
-
         internal void ProcessSSPI(int receivedLength)
         {
             Debug.Assert(_authenticationProvider is not null);
@@ -115,9 +56,6 @@ namespace Microsoft.Data.SqlClient
             FederatedAuthenticationFeatureExtensionData fedAuthFeatureExtensionData,
             SqlConnectionEncryptOption encrypt)
         {
-            // TODO: Initialization can be moved to class ctor in future after classes are merged.
-            InitClientInterfaceName();
-
             _physicalStateObj.SetTimeoutSeconds(rec.timeout);
 
             Debug.Assert(recoverySessionData == null || (requestedFeatures & TdsEnums.FeatureExtension.SessionRecovery) != 0, "Recovery session data without session recovery feature request");
@@ -184,16 +122,13 @@ namespace Microsoft.Data.SqlClient
             int length = TdsEnums.SQL2005_LOG_REC_FIXED_LEN;
 
             // Obtain the client interface name.
-            // e.g. "Microsoft SqlClient - Microsoft Windows 10.0.26100, .NET 8.0.11 - X64"
             string clientInterfaceName = ClientInterface.Name;
-
-            Debug.Assert(TdsEnums.MAXLEN_CLIENTINTERFACE >= clientInterfaceName.Length, "cchCltIntName can specify at most 128 unicode characters. See Tds spec");
 
             // add up variable-len portions (multiply by 2 for byte len of char strings)
             checked
             {
                 length += (rec.hostName.Length + rec.applicationName.Length +
-                            rec.serverName.Length + s_clientInterfaceName.Length +
+                            rec.serverName.Length + clientInterfaceName.Length +
                             rec.language.Length + rec.database.Length +
                             rec.attachDBFilename.Length) * 2;
                 if (useFeatureExt)
@@ -262,7 +197,7 @@ namespace Microsoft.Data.SqlClient
                            userName,
                            length,
                            feOffset,
-                           s_clientInterfaceName,
+                           clientInterfaceName,
                            outSSPIBuff,
                            outSSPILength);
 

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -13,9 +14,8 @@ namespace Microsoft.Data.SqlClient
         // ====================================================================
         // Properties
 
-        // --------------------------------------------------------------------
         // The client interface name, never null, never empty, and never larger
-        // than 128 characters.
+        // than TdsEnum.MAXLEN_CLIENTINTERFACE characters.
         //
         // Format:
         //
@@ -47,7 +47,6 @@ namespace Microsoft.Data.SqlClient
         // ====================================================================
         // Private Helpers
 
-        // --------------------------------------------------------------------
         // Static construction builds the client interface name.
         //
         // All known exceptions are caught and handled by providing a fallback
@@ -90,7 +89,7 @@ namespace Microsoft.Data.SqlClient
 #endif // NET
                 else
                 {
-                    name.Append(_unknown);
+                    name.Append(Unknown);
                 }
                 name.Append(' ');
 
@@ -107,13 +106,23 @@ namespace Microsoft.Data.SqlClient
                     //
                     // All parts are decimal integers.
                     //
-                    name.Append(Environment.OSVersion.Version);
+                    name.Append(
+#if NET
+                        // TODO: Why the special case for FreeBSD here?
+                        // GetSystemVersion() returns the .NET runtime version,
+                        // not the OS version.
+                        RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD)
+                        ? RuntimeEnvironment.GetSystemVersion()
+                        : Environment.OSVersion.Version);
+#else
+                        Environment.OSVersion.Version);
+#endif // NET
                 }
                 catch (InvalidOperationException)
                 {
                     // Environment.OSVersion failed in an unexpected way, so use
                     // a fallback value.
-                    name.Append(_unknown);
+                    name.Append(Unknown);
                 }
                 name.Append(", ");
 
@@ -123,12 +132,19 @@ namespace Microsoft.Data.SqlClient
                 // that it will always return a non-null value, so apply our
                 // unknown value in that unlikely case.
                 name.Append(
-                    RuntimeInformation.FrameworkDescription ?? _unknown);
+                    RuntimeInformation.FrameworkDescription ?? Unknown);
                 name.Append(" - ");
 
                 // Add the architecture.
+#if TARGET_X86 || TARGET_AMD64 || TARGET_ARM || TARGET_ARM64 || TARGET_WASM || TARGET_S390X || TARGET_LOONGARCH64 || TARGET_POWERPC64 || TARGET_RISCV64
+                // TODO: Why the special case for some target architectures
+                // here?  Architecture is an enum, so there is no such thing as
+                // an unknown value.
                 name.Append(RuntimeInformation.ProcessArchitecture);
-
+#else
+                name.Append(Unknown);
+#endif
+                
                 // Remember it!
                 _name = name.ToString();
 
@@ -137,6 +153,8 @@ namespace Microsoft.Data.SqlClient
                 {
                     _name = _name.Substring(0, TdsEnums.MAXLEN_CLIENTINTERFACE);
                 }
+
+                Debug.Assert(_name.Length <= TdsEnums.MAXLEN_CLIENTINTERFACE);
             }
             catch (ArgumentOutOfRangeException)
             {
@@ -145,7 +163,7 @@ namespace Microsoft.Data.SqlClient
                 _name =
                   Common.DbConnectionStringDefaults.ApplicationName +
                   " - " +
-                  _unknown;
+                  Unknown;
             }
         }
 
@@ -157,6 +175,6 @@ namespace Microsoft.Data.SqlClient
 
         // A placeholder string for parts of the client interface name that are
         // unknown.
-        private const string _unknown = "Unknown";
+        private const string Unknown = "Unknown";
     }
 }

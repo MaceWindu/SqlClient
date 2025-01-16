@@ -273,13 +273,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "steps", "steps", "{EABE3A3E
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libraries", "libraries", "{75BAE755-3A1F-41F2-9176-9F8FF9FEE2DD}"
 	ProjectSection(SolutionItems) = preProject
-		..\eng\pipelines\libraries\akv-variables.yml = ..\eng\pipelines\libraries\akv-variables.yml
-		..\eng\pipelines\libraries\build-variables.yml = ..\eng\pipelines\libraries\build-variables.yml
 		..\eng\pipelines\libraries\ci-build-variables.yml = ..\eng\pipelines\libraries\ci-build-variables.yml
-		..\eng\pipelines\libraries\common-variables.yml = ..\eng\pipelines\libraries\common-variables.yml
-		..\eng\pipelines\libraries\mds-validation-variables.yml = ..\eng\pipelines\libraries\mds-validation-variables.yml
-		..\eng\pipelines\libraries\mds-variables.yml = ..\eng\pipelines\libraries\mds-variables.yml
-		..\eng\pipelines\libraries\variables.yml = ..\eng\pipelines\libraries\variables.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "variables", "variables", "{FD3A15F7-1DD0-4773-922B-76B461E85322}"

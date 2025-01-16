@@ -35,7 +35,7 @@
     <Otherwise>
       <PropertyGroup>
         <TargetFrameworks Condition="'$(TestTargetOS)' == 'Windowsnetcoreapp' OR '$(TestTargetOS)' == 'Unixnetcoreapp'">net8.0;net9.0</TargetFrameworks>
-        <TargetFrameworks Condition="'$(TestTargetOS)' == 'Windowsnetfx'">net462</TargetFrameworks>
+        <TargetFrameworks Condition="'$(TestTargetOS)' == 'Windowsnetfx' OR '$(TestTargetOS)' == 'Unixnetfx'">net462</TargetFrameworks>
       </PropertyGroup>
     </Otherwise>
   </Choose>

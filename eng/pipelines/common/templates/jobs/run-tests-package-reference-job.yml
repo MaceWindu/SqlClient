@@ -30,9 +30,6 @@ jobs:
     isCustom: true
     name: ADO-1ES-Pool
     vmImage: 'ADO-MMS22-SQL19'
-    
-  variables: # More settings at https://aka.ms/obpipelines/yaml/jobs
-  - template: ../../../libraries/mds-validation-variables.yml@self
 
   steps:
   - template: ../steps/pre-build-step.yml

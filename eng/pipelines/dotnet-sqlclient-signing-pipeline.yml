@@ -68,6 +68,11 @@ parameters: # parameters are shown up in ADO UI in a build queue time
   default: false
 
 variables:
+  - template: variables/common-variables.yml@self
+  - template: variables/onebranch-variables.yml@self
+  - template: variables/mds-variables.yml@self
+  - template: variables/akv-variables.yml@self
+
   - template: /eng/pipelines/libraries/variables.yml@self
   - name: packageFolderName
     value: drop_buildMDS_build_signed_package

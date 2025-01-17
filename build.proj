@@ -37,11 +37,9 @@
     <TFGroup Condition="'$([MSBuild]::GetTargetFrameworkIdentifier($(TF)))' == '.NETCoreApp'">netcore</TFGroup>
     <TargetGroup Condition="'$(TFGroup)' == 'netfx'" >netfx</TargetGroup>
     <TargetGroup Condition="'$(TFGroup)' == 'netcore'">netcoreapp</TargetGroup>
-    <TargetNetCoreVersion Condition="$(TargetGroup) == 'netcoreapp' AND $(TargetNetCoreVersion) == ''">$(TF)</TargetNetCoreVersion>
-    <TargetNetFxVersion Condition="$(TargetGroup) == 'netfx' AND $(TargetNetFxVersion) == ''">$(TF)</TargetNetFxVersion>
     <SqlServerLibProperties>Configuration=$(Configuration);AssemblyVersion=$(SqlServerAssemblyVersion);AssemblyFileVersion=$(SqlServerAssemblyFileVersion);Version=$(SqlServerPackageVersion);</SqlServerLibProperties>
     <ProjectProperties>Configuration=$(Configuration);AssemblyFileVersion=$(AssemblyFileVersion);TargetsWindows=$(TargetsWindows);TargetsUnix=$(TargetsUnix);</ProjectProperties>
-    <TestProjectProperties>BuildProjectReferences=false;$(ProjectProperties);BuildForRelease=false;TargetNetCoreVersion=$(TargetNetCoreVersion);TargetNetFxVersion=$(TargetNetFxVersion)</TestProjectProperties>
+    <TestProjectProperties>BuildProjectReferences=false;$(ProjectProperties);BuildForRelease=false;</TestProjectProperties>
     <ResultsDirectory Condition="$(ResultsDirectory) == ''">TestResults</ResultsDirectory>
     <!-- 
       Path to a `dotnet` version like a x86 or any especific versions in addition to a default installed version.
@@ -206,11 +204,23 @@
   </Target>
 
   <Target Name="Clean">
-    <RemoveDir Directories='$([System.IO.Directory]::GetDirectories(".","artifacts", SearchOption.AllDirectories))' />
-    <RemoveDir Directories='$([System.IO.Directory]::GetDirectories(".","bin", SearchOption.AllDirectories))' />
-    <RemoveDir Directories='$([System.IO.Directory]::GetDirectories(".","obj", SearchOption.AllDirectories))' />
-    <RemoveDir Directories='$([System.IO.Directory]::GetDirectories(".","packages", SearchOption.AllDirectories))' />
-    <RemoveDir Directories='$([System.IO.Directory]::GetDirectories(".",".nuget", SearchOption.AllDirectories))' />
+    <RemoveDir Directories='$([System.IO.Directory]::GetDirectories(".","artifacts", SearchOption.AllDirectories))'>
+      <Output TaskParameter="RemovedDirectories" ItemName="Clean_RemovedDirs" />
+    </RemoveDir>
+    <RemoveDir Directories='$([System.IO.Directory]::GetDirectories(".","bin", SearchOption.AllDirectories))'>
+      <Output TaskParameter="RemovedDirectories" ItemName="Clean_RemovedDirs" />
+    </RemoveDir>
+    <RemoveDir Directories='$([System.IO.Directory]::GetDirectories(".","obj", SearchOption.AllDirectories))'>
+      <Output TaskParameter="RemovedDirectories" ItemName="Clean_RemovedDirs" />
+    </RemoveDir>
+    <RemoveDir Directories='$([System.IO.Directory]::GetDirectories(".","packages", SearchOption.AllDirectories))'>
+      <Output TaskParameter="RemovedDirectories" ItemName="Clean_RemovedDirs" />
+    </RemoveDir>
+    <RemoveDir Directories='$([System.IO.Directory]::GetDirectories(".",".nuget", SearchOption.AllDirectories))'>
+      <Output TaskParameter="RemovedDirectories" ItemName="Clean_RemovedDirs" />
+    </RemoveDir>
+
+    <Message Text="Removed directories: @(Clean_RemovedDirs)" />
   </Target>
 
   <Target Name="BuildAKVNetFx">

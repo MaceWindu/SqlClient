@@ -53,7 +53,7 @@ namespace Microsoft.Data.SqlClient
 
         // Static construction builds the client interface name.
         //
-        // We make a best effort to avoid allowing known exceptions to escape.
+        // We make a best effort to avoid known exceptions escaping.
         //
         static ClientInterface()
         {
@@ -72,11 +72,6 @@ namespace Microsoft.Data.SqlClient
                 name.Append(Common.DbConnectionStringDefaults.ApplicationName);
                 name.Append(" - ");
 
-// RuntimeInformation and OSPlatform don't exist in .NET Framework 4.6.2 or 4.7.
-#if NET462 || NET47
-                // Those target frameworks only exist on Windows.
-                name.Append("Windows");
-#else
                 // Add the OS name, in order of likelihood.
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
@@ -90,7 +85,7 @@ namespace Microsoft.Data.SqlClient
                 {
                     name.Append("macOS");
                 }
-// The FreeBSD platform doesn't exist in .NET Framework.
+// The FreeBSD platform doesn't exist in .NET Framework at all.
 #if NET
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.FreeBSD))
                 {
@@ -101,7 +96,6 @@ namespace Microsoft.Data.SqlClient
                 {
                     name.Append(Unknown);
                 }
-#endif // NET462 || NET47
 
                 name.Append(' ');
 
@@ -138,25 +132,11 @@ namespace Microsoft.Data.SqlClient
                 // value in that unlikely case.
                 //
                 name.Append(
-#if NET462
-                    // .NET Framework 4.6.2 doesn't have FrameworkDescription.
-                    ".NET Framework 4.6.2");
-#elif NET47
-                    // .NET Framework 4.7 doesn't have FrameworkDescription.
-                    ".NET Framework 4.7");
-#else
                     RuntimeInformation.FrameworkDescription ?? Unknown);
-#endif // NET462
                 name.Append(" - ");
 
                 // Add the architecture.
-// RuntimeInformation doesn't exist in .NET Framework 4.6.2 or 4.7.
-#if NET462 || NET47
-                // We can't get the process architecture.
-                name.Append(Unknown);
-#else
                 name.Append(RuntimeInformation.ProcessArchitecture);
-#endif // NET464 || NET47
 
                 // Remember it!
                 _name = name.ToString();

@@ -5,7 +5,9 @@
 #################################################################################
 
 variables:
-    - group: 'Common Variables [v2]'
+    - group: 'Common Variables (v2)'
+      # appRegistrationClientId
+      # appRegistrationTenantId
 
     - name: Configuration
       value: Release
@@ -19,10 +21,3 @@ variables:
       value: $(REPOROOT)/symbols
     - name: artifactDirectory
       value: '$(REPOROOT)/packages'
-
-    # @TODO: Move to common variables group
-    - name: appRegistrationClientId
-      value: 'a0d18a38-fde1-4ba7-92e1-15be16cb6a8e'
-    # @TODO: Move to common variables group
-    - name: appRegistrationTenantId
-      value: '72f988bf-86f1-41af-91ab-2d7cd011db47'

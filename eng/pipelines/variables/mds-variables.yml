@@ -5,7 +5,20 @@
 #################################################################################
 
 variables:
-    - group: 'MDS Variables [v2]'
+    - group: 'MDS Variables (v2)'
+      # BuildRemarkPre
+      # BuildRemarkProd
+      # CommitHead
+      # Major
+      # Minor
+      # PAT_TAG
+      # PAG-SQLDRVRS
+      # Patch
+      # Preview
+      # PublishSymbols
+      # Revision
+      # SymbolServer
+      # SymbolTokenUri
 
     # Variables for building -----------------------------------------------
     - name: NugetPackageVersion

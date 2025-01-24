@@ -5,7 +5,19 @@
 #################################################################################
 
 variables:
-    - group: 'AKV Variables [v2]'
+    - group: 'AKV Variables (v2)'
+      # AKVMajor
+      # AKVMinor
+      # AKVPatch
+      # AKVRevision
+      # BuildRemarkPre
+      # BuildRemarkProd
+      # Major
+      # Minor
+      # PAT_AKV
+      # Patch
+      # Preview
+      # Revision
 
     - name: AKVNugetPackageVersion
       value: '$(AKVMajor).$(AKVMinor).$(AKVPatch)'
